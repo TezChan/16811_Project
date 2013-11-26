@@ -26,7 +26,7 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
     goal_dist = h_list(start);
     open_list(open_count,:) = insert_open(start,NaN,path_cost,goal_dist,path_cost+goal_dist);
     % set start as current node, 
-    current = start
+    current = start;
     % pop from open
     open_list(open_count,OPEN_ISON) = 0;
     % add to closed
@@ -37,8 +37,8 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
     % DO MAIN LOOP
     while (current~=target && ~no_path)
         %expand around currentNode
-        save('state.mat','current','closed_list','open_list')
-        neighbor_list = get_neighbors(current,path_cost, closed_list,adjMat,h_list)
+%         save('state.mat','current','closed_list','open_list')
+        neighbor_list = get_neighbors(current,path_cost, closed_list,adjMat,h_list);
         neighbor_count = size(neighbor_list,1);
         % OPEN LIST STRUCTURE: 
         % IS ON 1/0 | node | parent node | h(n) | g(n) | f(n)
@@ -80,7 +80,7 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
         % if new node found
         if (index_min_node ~= -1)
             %pop current
-            current = open_list(index_min_node,OPEN_NODE)
+            current = open_list(index_min_node,OPEN_NODE);
             path_cost = open_list(index_min_node,OPEN_H);
             %move to closed
             closed_count = closed_count+1;
@@ -89,7 +89,7 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
         else %no path
             no_path = 1;
         end % end min node check
-        open_list = open_list
+        open_list = open_list;
     end % end while
     
     % Retrace path
@@ -98,7 +98,7 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
     open_index = get_open_index(current,open_list);
     pathdist = open_list(open_index,OPEN_F);
     %Find current in open list
-    while current ~= start && open_index~=-1 && ii<10
+    while current ~= start && open_index~=-1
         open_index = get_open_index(current,open_list);
         current = open_list(open_index,OPEN_PARENT);
         ii = ii+1;
