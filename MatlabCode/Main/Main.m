@@ -9,12 +9,12 @@ close all
 clc
 
 radius = 15;
-robot_dist = 45;
+robot_dist = 30;
 rot = true;
 
 
 %get map
-map = imread('map4.png');
+map = imread('map5.png');
 map = im2bw(map,.5);
 map = ~map;
 figure
@@ -23,16 +23,17 @@ colormap gray
 extended_map = extendMap(map,radius);
 
 compare = map+extended_map;
-figure
+f1=figure
 imagesc(compare)
 colormap gray
 
 start_x = 5; start_y = 5; start_th = 0;
-goal_x = size(extended_map,2)-20; goal_y = size(extended_map,1)-20; goal_th = -90;
+% goal_x = size(extended_map,2)-10; goal_y = size(extended_map,1)-10; goal_th = -90;
+goal_x = 120; goal_y = 140; goal_th = 180;
 
 % choose sampling points
-res = 20;
-th_res = 30;
+res = 10;
+th_res = 15;
 if rot
     [X,Y,TH] = meshgrid(res:res:size(extended_map,2),...
         res:res:size(extended_map,1),...
@@ -41,6 +42,8 @@ else
     [X,Y] = meshgrid(res:res:size(extended_map,2),...
         res:res:size(extended_map,1));
 end
+
+
 
 % for every pt
 X = [start_x goal_x X(1:end)];
@@ -51,6 +54,20 @@ if rot
     X2 = round(X+cosd(TH)*robot_dist);
 end
 OKlong = ones(size(X));
+
+%plot all points
+hold on
+p1 = quiver(X,Y,X2-X,Y2-Y)
+p2 = plot(X,Y,'r.');
+
+f1=gcf;
+f2=figure;
+objects=allchild(f1);
+copyobj(get(f1,'children'),f2);
+colormap gray
+figure(f1)
+delete(p1)
+delete(p2)
 
 if rot
     for ii=1:length(X)
@@ -81,7 +98,14 @@ if rot
 end
 
 hold on
-% plot(X,Y,'r.')
+quiver(X,Y,X2-X,Y2-Y)
+plot(X,Y,'r.')
+f1=gcf;
+f2=figure;
+objects=allchild(f1);
+copyobj(get(f1,'children'),f2);
+colormap gray
+
 
 % graph = zeros(length(X));
 aa = zeros(size(X));
@@ -101,8 +125,8 @@ for ii = 1:length(X)
     end
     for jj = ii:length(X)
         if rot
-            h_list(ii) = norm([(X(ii)+X2(ii))/2-goal_x;
-                (Y(ii)+Y2(ii))/2-goal_y]);
+            h_list(ii) = norm([X(ii)-X(2);X2(ii)-X2(2);...
+                Y(ii)-Y(2);Y2(ii)+Y2(2)]);
             dist = norm([X(ii)-X(jj);
                 Y(ii)-Y(jj);
                 TH(ii)-TH(jj)]);
@@ -118,7 +142,7 @@ for ii = 1:length(X)
         %             Y(ii)-Y(jj)]);
         
         %         if dist<=sqrt(3)*res
-        if dist<=sqrt(3)*res
+        if dist<=norm([res;res;th_res])+1
             %             graph(ii,jj) = dist;
             %             graph(jj,ii) = dist;
             aa(kk) = ii;
@@ -142,7 +166,7 @@ graph = sparse(aa,bb,cc);
 
 display('starting astar')
 
-[pathdist, path, pred]=aStar(graph,h_list,1,2);
+[pathdist, path, pred]=aStar(graph,h_list,1,2)
 
 xpath = X(path);
 ypath = Y(path);

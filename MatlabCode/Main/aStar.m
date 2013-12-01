@@ -96,7 +96,11 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
     ii = 1;
     path(ii) = current;
     open_index = get_open_index(current,open_list);
-    pathdist = open_list(open_index,OPEN_F);
+    if open_index == -1
+        pathdist = NaN;
+    else
+        pathdist = open_list(open_index,OPEN_F);
+    end
     %Find current in open list
     while current ~= start && open_index~=-1
         open_index = get_open_index(current,open_list);
