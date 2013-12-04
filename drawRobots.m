@@ -1,18 +1,21 @@
-function drawRobots(x, y, theta)
+function drawRobots(robots, x, y, theta)
 % Draws the two robots onto the world map. Assumes the figure is already
 % created.
 % 
 % INPUTS
+% robots: struct containing robot parameters.
 % x, y: x-y position of the red robot in world coordinates.
 % theta: angle of the linkage from North (in world frame) going clockwise.
 % I.e pi/2 is directly East.
 %
 % USAGE
-% drawRobots(70, 70, pi/2);
+% robots.radius = 5;
+% robots.linkage = 15;
+% drawRobots(robots, 70, 70, pi/2);
 
     % Initialize constants.
-    robot_radius = 5;
-    linkage_length = 15;
+    robot_radius = robots.radius;
+    linkage_length = robots.linkage;
     
     % Equations for a circular robot.
     t = 0:.1:2*pi+0.2;
@@ -28,6 +31,6 @@ function drawRobots(x, y, theta)
     plot(xs + x2, ys + y2, 'c');
     
     % Draw the linkage.
-    plot([x x2], [y y2], 'bx-');
+    plot([x x2], [y y2], 'bx-', 'LineWidth', 2);
 
 end
