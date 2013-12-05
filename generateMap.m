@@ -11,6 +11,8 @@ function map = generateMap(map_image, world_size)
 
     I = imread(map_image);
     I = rgb2gray(I);
+    
+    imsize = size(I);
 
     x = floor(linspace(1, size(I, 1), world_size(2)));
     y = floor(linspace(1, size(I, 2), world_size(1)));
@@ -18,4 +20,5 @@ function map = generateMap(map_image, world_size)
     I = I(x', y');
     map.obstacles = I < 20;
     map.size = world_size;
+    map.space = imsize ./ [world_size(2) world_size(1)];
 end
