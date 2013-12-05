@@ -17,19 +17,30 @@ rot = true;
 map = imread('map5.png');
 map = im2bw(map,.5);
 map = ~map;
-figure
-imagesc(map)
-colormap gray
+% figure;
+% imagesc(map);
+% colormap gray;
 extended_map = extendMap(map,radius);
 
 compare = map+extended_map;
-f1=figure
-imagesc(compare)
-colormap gray
+f1=figure;
+imagesc(compare);
+colormap gray;
 
-start_x = 5; start_y = 5; start_th = 0;
-% goal_x = size(extended_map,2)-10; goal_y = size(extended_map,1)-10; goal_th = -90;
-goal_x = 120; goal_y = 140; goal_th = 180;
+% Prompt user for start and goal.
+prompt_fig = figure;
+imshow('map5.png');
+disp('Pick the location of the robots starting configuration');
+[x, y] = ginput(2);
+start_x = round(x(1));
+start_y = round(y(1));
+start_th = atan2d(y(2) - y(1), x(2) - x(1));
+disp('Pick the location of the robots final configuration');
+[x, y] = ginput(2);
+goal_x = round(x(1));
+goal_y = round(y(1));
+goal_th = atan2d(y(2) - y(1), x(2) - x(1));
+close(prompt_fig);
 
 % choose sampling points
 res = 10;
@@ -59,6 +70,9 @@ OKlong = ones(size(X));
 hold on
 p1 = quiver(X,Y,X2-X,Y2-Y)
 p2 = plot(X,Y,'r.');
+% Plot the start and goal points.
+plot(X(1:2), Y(1:2), 'cx');
+plot(X2(1:2), Y2(1:2), 'co');
 
 f1=gcf;
 f2=figure;
@@ -166,7 +180,7 @@ graph = sparse(aa,bb,cc);
 
 display('starting astar')
 
-[pathdist, path, pred]=aStar(graph,h_list,1,2)
+[pathdist, path, pred]=aStar(graph,h_list,1,2);
 
 xpath = X(path);
 ypath = Y(path);
