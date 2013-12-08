@@ -7,7 +7,7 @@
 % heuristicVec(5) = 4, then the heuristic estimate for node 5 is 4
 % start - node to start from
 % finish - node to finish from
-function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
+function [pathdist, path, pred, num_explored]=aStar(adjMat,h_list,start,target)
     % initialize lists
     % OPEN LIST STRUCTURE: 
     % IS ON 1/0 | node | parent node | h(n) | g(n) | f(n)
@@ -120,6 +120,10 @@ function [pathdist, path, pred]=aStar(adjMat,h_list,start,target)
         end
     end
     
+    
+    % return number of nodes explored. this is sum of size of open and
+    % closed lists.
+    num_explored = size(open_list,1) + size(closed_list, 1);
 end
 
 function new_row = insert_open(node,parent_node,hn,gn,fn)

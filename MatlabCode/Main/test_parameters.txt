@@ -1,0 +1,33 @@
+TEST 1  (845, 265.2356, 470.6599)
+
+h_list(ii) = norm([X(ii)-X(2);X2(ii)-X2(2);...
+                   Y(ii)-Y(2);Y2(ii)-Y2(2)]);
+dist = norm([X(ii)-X(jj);
+            Y(ii)-Y(jj);
+            TH(ii)-TH(jj)]);
+
+TEST 2  (2337, 328.9960, 430.2332)
+
+h_list(ii) = norm([X(ii)-X(2); Y(ii)-Y(2)])...
+           + norm([X2(ii)-X2(2); Y2(ii)-Y2(2)]);
+dist = norm([X(ii)-X(jj); Y(ii)-Y(jj)])...
+     + norm([X2(ii)-X2(jj); Y2(ii)-Y2(jj)]);
+
+TEST 3  (1383, 261.4478, 467.5458)
+
+h_list(ii) = norm([X(ii)-X(2); Y(ii)-Y(2); TH(ii) - TH(2)]);
+dist = norm([X(ii)-X(jj); Y(ii)-Y(jj); TH(ii)-TH(jj)]);
+
+TEST 4  (5226, 328.9960, 430.2332)
+
+h_list(ii) = norm([X(ii)-X(2); Y(ii)-Y(2)]);
+dist = norm([X(ii)-X(jj); Y(ii)-Y(jj)])...
+     + norm([X2(ii)-X2(jj); Y2(ii)-Y2(jj)]);
+
+TEST 5  (2263, 328.9960, 430.2332)
+
+h_list(ii) = norm([X(ii)-X(2);X2(ii)-X2(2);...
+                   Y(ii)-Y(2);Y2(ii)-Y2(2)]);
+dist = norm([X(ii)-X(jj);X2(ii)-X2(jj);...
+             Y(ii)-Y(jj);Y2(ii)-Y2(jj)]);
+
