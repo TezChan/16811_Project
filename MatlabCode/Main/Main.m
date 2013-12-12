@@ -28,22 +28,22 @@ imagesc(compare);
 colormap gray;
 
 % Load preconfigured start and goal.
-load('test_settings.mat');
+% load('test_settings.mat');
 
-% % Prompt user for start and goal.
-% prompt_fig = figure;
-% imshow('map5.png');
-% disp('Pick the location of the robots starting configuration');
-% [x, y] = ginput(2);
-% start_x = round(x(1));
-% start_y = round(y(1));
-% start_th = atan2d(y(2) - y(1), x(2) - x(1));
-% disp('Pick the location of the robots final configuration');
-% [x, y] = ginput(2);
-% goal_x = round(x(1));
-% goal_y = round(y(1));
-% goal_th = atan2d(y(2) - y(1), x(2) - x(1));
-% close(prompt_fig);
+% Prompt user for start and goal.
+prompt_fig = figure;
+imshow('map5.png');
+disp('Pick the location of the robots starting configuration');
+[x, y] = ginput(2);
+start_x = round(x(1));
+start_y = round(y(1));
+start_th = atan2d(y(2) - y(1), x(2) - x(1));
+disp('Pick the location of the robots final configuration');
+[x, y] = ginput(2);
+goal_x = round(x(1));
+goal_y = round(y(1));
+goal_th = atan2d(y(2) - y(1), x(2) - x(1));
+close(prompt_fig);
 
 % choose sampling points
 res = 10;
@@ -123,61 +123,100 @@ objects=allchild(f1);
 copyobj(get(f1,'children'),f2);
 colormap gray
 
+if rot
+    neighbor_dist = pdist2([X' Y' TH'],[X' Y' TH']);
+else
+    neighbor_dist = pdist2([X; Y]',[X; Y]');
+end
 
-% graph = zeros(length(X));
-aa = zeros(size(X));
-bb = zeros(size(X));
-cc = zeros(size(X));
-h_list = inf(length(X),1);
+start_edge = [];
+end_edge = [];
+edge_value = [];
 display(strcat('populating graph of ',' ',int2str(length(X)),' nodes'))
 timer1 = tic();
 last_time = 0;
-est_time = true;
-kk = 1;
-for ii = 1:length(X)
+for ii=1:length(X)
     if(toc(timer1)-last_time>10)
         last_time = last_time+10;
         time_proj = (length(X)-ii)/ii *last_time;
         display(strcat('estimated completion in ',' ', num2str(time_proj),' seconds'));
     end
+        
+    neighbors = find(neighbor_dist(ii, :) <= norm([res;res;th_res])+1);
     
     if rot
-        h_list(ii) = norm([X(ii)-X(2);X2(ii)-X2(2);...
-                           Y(ii)-Y(2);Y2(ii)-Y2(2)]);
+        dist = pdist2([X(neighbors)' Y(neighbors)' TH(neighbors)'], [X(ii) Y(ii) TH(ii)]);
     else
-        h_list(ii) = norm([X(ii)-goal_x;
-                           Y(ii)-goal_y]);
+        dist = pdist2([X(neighbors)' Y(neighbors)'], [X(ii) Y(ii)]);
     end
     
-    for jj = ii:length(X)
-        if rot
-            dist = norm([X(ii)-X(jj);
-                        Y(ii)-Y(jj);
-                        TH(ii)-TH(jj)]);
-        else
-            dist = norm([X(ii)-X(jj);
-                         Y(ii)-Y(jj)]);
-        end
-        
-        if rot
-            neighbor_dist = norm([X(ii)-X(jj); Y(ii)-Y(jj); TH(ii)-TH(jj)]);
-        else
-            neighbor_dist = norm([X(ii)-X(jj); Y(ii)-Y(jj)]);
-        end
-            
-        if neighbor_dist <=norm([res;res;th_res])+1
-            aa(kk) = ii;
-            bb(kk) = jj;
-            cc(kk) = dist;
-            kk = kk+1;
-        end
-    end
+    start_edge = [start_edge; repmat(ii, size(neighbors, 2), 1)];
+    end_edge = [end_edge; neighbors'];
+    edge_value = [edge_value; dist];
+end
+toc(timer1)
+
+graph = sparse([start_edge end_edge],[end_edge start_edge],[edge_value edge_value]);
+if rot
+    h_list = pdist2([X' Y' X2' Y2'], [X(2) Y(2) X2(2) Y2(2)]);
+else
+    h_list = pdist2([X' Y'], [X(2) Y(2)]);
 end
 
-aa = aa(aa~=0);
-bb = bb(aa~=0);
-cc = cc(aa~=0);
-graph = sparse([aa bb],[bb aa],[cc cc]);
+% % graph = zeros(length(X));
+% aa = zeros(size(X));
+% bb = zeros(size(X));
+% cc = zeros(size(X));
+% h_list = inf(length(X),1);
+% display(strcat('populating graph of ',' ',int2str(length(X)),' nodes'))
+% timer1 = tic();
+% last_time = 0;
+% est_time = true;
+% kk = 1;
+% for ii = 1:length(X)
+%     if(toc(timer1)-last_time>10)
+%         last_time = last_time+10;
+%         time_proj = (length(X)-ii)/ii *last_time;
+%         display(strcat('estimated completion in ',' ', num2str(time_proj),' seconds'));
+%     end
+%     
+%     if rot
+%         h_list(ii) = norm([X(ii)-X(2);X2(ii)-X2(2);...
+%                            Y(ii)-Y(2);Y2(ii)-Y2(2)]);
+%     else
+%         h_list(ii) = norm([X(ii)-goal_x;
+%                            Y(ii)-goal_y]);
+%     end
+%     
+%     for jj = ii:length(X)
+%         if rot
+%             dist = norm([X(ii)-X(jj);
+%                         Y(ii)-Y(jj);
+%                         TH(ii)-TH(jj)]);
+%         else
+%             dist = norm([X(ii)-X(jj);
+%                          Y(ii)-Y(jj)]);
+%         end
+%         
+%         if rot
+%             neighbor_dist = norm([X(ii)-X(jj); Y(ii)-Y(jj); TH(ii)-TH(jj)]);
+%         else
+%             neighbor_dist = norm([X(ii)-X(jj); Y(ii)-Y(jj)]);
+%         end
+%             
+%         if neighbor_dist <=norm([res;res;th_res])+1
+%             aa(kk) = ii;
+%             bb(kk) = jj;
+%             cc(kk) = dist;
+%             kk = kk+1;
+%         end
+%     end
+% end
+% 
+% aa = aa(aa~=0);
+% bb = bb(aa~=0);
+% cc = cc(aa~=0);
+% graph = sparse([aa bb],[bb aa],[cc cc]);
 
 
 %% ASTAR
